@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.database import engine, Base
 from app.models import models
-from app.api import auth
+from app.api import auth, upload
 
 # Create all tables automatically
 Base.metadata.create_all(bind=engine)
@@ -23,6 +23,7 @@ app.add_middleware(
 
 # Register routers
 app.include_router(auth.router)
+app.include_router(upload.router)
 
 @app.get("/")
 async def root():

@@ -1,0 +1,25 @@
+# Python virtual environment
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/.env
+
+# Uploads
+backend/uploads/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
