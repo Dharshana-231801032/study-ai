@@ -36,11 +36,16 @@ async def upload_pdf(
     # Verify user
     current_user = get_current_user(token, db)
 
-    # Validate file type
-    if not file.filename.endswith(".pdf"):
+    # Accept all supported formats
+    allowed_extensions = [
+        '.pdf', '.docx', '.doc',
+        '.png', '.jpg', '.jpeg'
+    ]
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    if file_ext not in allowed_extensions:
         raise HTTPException(
             status_code=400,
-            detail="Only PDF files are allowed"
+            detail=f"Unsupported format. Allowed: {', '.join(allowed_extensions)}"
         )
 
     # Validate file size (max 10MB)

@@ -30,6 +30,7 @@ class Document(Base):
     upload_date = Column(DateTime, default=datetime.utcnow)
     processed = Column(Boolean, default=False)
     subject = Column(String, nullable=True)
+    doc_type = Column(String, default="notes")   # "syllabus" or "notes"
 
     owner = relationship("User", back_populates="documents")
     topics = relationship("Topic", back_populates="document")
@@ -40,11 +41,14 @@ class Topic(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=False)
-    topic_name = Column(String, nullable=False)
-    keywords = Column(Text, nullable=True)
+    unit_number = Column(String, nullable=True)      # UNIT-I, UNIT-II...
+    unit_title = Column(String, nullable=False)       # Encryption Techniques
+    sub_topics = Column(Text, nullable=True)          # comma separated sub topics
+    keywords = Column(Text, nullable=True)            # extracted keywords
+    mapped_content = Column(Text, nullable=True)      # notes content mapped here
     summary = Column(Text, nullable=True)
     confidence_score = Column(Float, default=0.0)
-    unit_mapping = Column(String, nullable=True)
+    is_syllabus = Column(Boolean, default=False)      # True = from syllabus, False = from notes
 
     document = relationship("Document", back_populates="topics")
     questions = relationship("Question", back_populates="topic")

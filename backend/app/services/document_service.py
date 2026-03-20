@@ -29,7 +29,7 @@ def save_document(
 
 
 def process_document(db: Session, document_id: str) -> dict:
-    """Extract and clean text from uploaded PDF"""
+    """Extract and clean text from uploaded file"""
     doc = db.query(Document).filter(
         Document.id == document_id
     ).first()
@@ -37,13 +37,18 @@ def process_document(db: Session, document_id: str) -> dict:
     if not doc:
         return {"error": "Document not found"}
 
-    pdf_path = os.path.join(UPLOAD_DIR, doc.filename)
+    file_path = os.path.join(UPLOAD_DIR, doc.filename)
 
-    if not os.path.exists(pdf_path):
-        return {"error": "PDF file not found"}
+    if not os.path.exists(file_path):
+        return {"error": "File not found"}
 
-    # Extract text using PyMuPDF
-    extraction = extract_text_from_pdf(pdf_path)
+    # Auto-detect and extract text
+    from app.nlp.extractor import extract_text, clean_text
+    extraction = extract_text(file_path)
+
+    if "error" in extraction:
+        return {"error": extraction["error"]}
+
     cleaned = clean_text(extraction["full_text"])
 
     # Mark as processed
