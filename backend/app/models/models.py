@@ -62,6 +62,7 @@ class Question(Base):
     question_text = Column(Text, nullable=False)
     answer_text = Column(Text, nullable=False)
     question_type = Column(String, default="open")
+    marks = Column(Integer, default=1)
     difficulty = Column(String, default="medium")
     created_at = Column(DateTime, default=datetime.utcnow)
 

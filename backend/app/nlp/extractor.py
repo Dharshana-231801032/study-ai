@@ -113,16 +113,62 @@ def extract_text(file_path: str) -> dict:
 
 
 def clean_text(text: str) -> str:
-    """Clean extracted text for NLP processing"""
-    text = re.sub(r'\n+', '\n', text)
-    text = re.sub(r' +', ' ', text)
-    text = re.sub(r'[^\w\s\.\,\!\?\;\:\-\(\)]', ' ', text)
+    """
+    Advanced text cleaning for NLP processing
+    Removes formatting artifacts from PDFs
+    """
+    # Remove excessive whitespace and special chars
+    text = re.sub(r'\r\n', '\n', text)
+    text = re.sub(r'\r', '\n', text)
+
+    # Remove bullet points and special markers
+    text = re.sub(r'[●•·▪▸►◆★✓✔☐☑]', '', text)
+
+    # Remove multiple spaces
+    text = re.sub(r' {2,}', ' ', text)
+
+    # Remove lines that are just symbols or numbers
     lines = text.split('\n')
-    cleaned_lines = [
-        line.strip() for line in lines
-        if len(line.strip()) > 10
-    ]
-    return '\n'.join(cleaned_lines)
+    cleaned_lines = []
+    for line in lines:
+        line = line.strip()
+        # Skip empty lines
+        if not line:
+            continue
+        # Skip very short lines (page numbers, headers)
+        if len(line) < 15:
+            continue
+        # Skip lines that are mostly symbols
+        alpha_ratio = sum(c.isalpha() for c in line) / max(len(line), 1)
+        if alpha_ratio < 0.4:
+            continue
+        # Clean remaining formatting artifacts
+        line = re.sub(r'\s+', ' ', line)
+        line = re.sub(r'_{2,}', '', line)
+        line = re.sub(r'-{2,}', '', line)
+        line = re.sub(r'\|', ' ', line)
+        # Skip memory hooks, tips, and exam notes
+        skip_phrases = [
+            'memory hook', 'watch out', 'key distinction',
+            'tip:', 'note:', 'remember:', 'hint:',
+            'exam tip', 'mark scheme', 'confidential info always',
+            'doac', 'khap'
+        ]
+        if any(phrase in line.lower() for phrase in skip_phrases):
+            continue
+        cleaned_lines.append(line)
+
+    # Join lines into proper sentences
+    result = ' '.join(cleaned_lines)
+
+    # Fix spacing around punctuation
+    result = re.sub(r'\s+([.,;:!?])', r'\1', result)
+    result = re.sub(r'([.,;:!?])\s*', r'\1 ', result)
+
+    # Remove duplicate spaces again
+    result = re.sub(r' {2,}', ' ', result)
+
+    return result.strip()
 
 
 def extract_sentences(text: str) -> list:
