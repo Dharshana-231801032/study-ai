@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.database import engine, Base
 from app.models import models
-from app.api import auth, upload, topics, questions, flashcards
+from app.api import auth, upload, topics, questions, flashcards, review
 
 # Create all tables automatically
 Base.metadata.create_all(bind=engine)
@@ -27,6 +27,7 @@ app.include_router(upload.router)
 app.include_router(topics.router)
 app.include_router(questions.router)
 app.include_router(flashcards.router)
+app.include_router(review.router)
 
 @app.get("/")
 async def root():
